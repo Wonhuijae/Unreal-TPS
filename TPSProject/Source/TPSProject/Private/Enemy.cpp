@@ -3,6 +3,10 @@
 
 #include "Enemy.h"
 #include "EnemyFSM.h"
+#include "Components/WidgetComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -17,7 +21,7 @@ AEnemy::AEnemy()
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
 	}
 
-	fsm = CreateDefaultSubobject<UEnemyFSM>(TEXT("FSM"));
+	EnemyFSM = CreateDefaultSubobject<UEnemyFSM>(TEXT("FSM"));
 
 	// 애니메이션 블루프린트 할당하기
 	// 블루프린트 클래스는 반드시 _C를 붙여줌
@@ -26,6 +30,17 @@ AEnemy::AEnemy()
 	{
 		GetMesh()->SetAnimInstanceClass(tempClass.Class);
 	}
+
+	// 캡슐 컴포넌트와 메시 컴포넌트의 충돌 채널을 설정한다.
+	// 캡슐 컴포넌트 Visibility : Block / Camera : Ignore
+	// 메시 컴포넌트 Visibility : Ignore / Camera : Ignore
+	UCapsuleComponent* Cap = GetCapsuleComponent();
+	auto EMesh = GetMesh();
+	Cap->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	Cap->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	EMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+	EMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 }
 
 // Called when the game starts or when spawned

@@ -1,14 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+
 #include "TPSPlayer.h"
 #include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Bullet.h"
+#include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
+#include "EnemyFSM.h"
 #include "PlayerAnim.h"
+#include "GameFramework/PlayerController.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -74,6 +79,10 @@ void ATPSPlayer::BeginPlay()
 			subSystem->AddMappingContext(IMC_TPS, 0);
 		}
 	}
+
+	// UI 생성
+	CrosshairUI = CreateWidget(GetWorld(), CrosshairUIfactory);
+	CrosshairUI->AddToViewport();
 }
 
 // Called every frame
@@ -178,5 +187,29 @@ void ATPSPlayer::InputFire(const FInputActionValue& inputValue)
 	FTransform firePos = GetMesh()->GetSocketTransform(TEXT("Muzzle_01"));
 	GetWorld()->SpawnActor<ABullet>(BulletFactory, firePos);
 
-	 
+	// 라인 트레이스
+	FVector startPos = CameraComp->GetComponentLocation();
+	FVector endPos = CameraComp->GetComponentLocation() + CameraComp->GetForwardVector() * 100000;
+
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	// 플레이어를 충돌 판정에서 제외
+	Params.AddIgnoredActor(this);
+
+	// 충돌 정보, 시작 위치, 종료 위치, 검출 채널, 충돌 옵션
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, startPos, endPos, ECC_Visibility, Params);
+	if (bHit)
+	{
+		
+		FTransform effectPos;
+		effectPos.SetLocation(Hit.ImpactPoint);
+		// UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletEffectFactory, effectPos);
+	}
+	
+	auto enemy = Hit.GetActor()->GetDefaultSubobjectByName(TEXT("EnemyFSM"));
+	if (enemy)
+	{
+		auto enemyFSM = Cast<UEnemyFSM>(enemy);
+		enemyFSM->OnDamage();
+	}
 }

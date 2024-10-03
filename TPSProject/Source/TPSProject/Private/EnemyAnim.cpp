@@ -15,6 +15,6 @@ void UEnemyAnim::OnDamageEnd()
     AEnemy* Enemy = Cast<AEnemy>(TryGetPawnOwner());
     if (Enemy)
     {
-        // Enemy->EnemyFSM->OnChangeMoveState();
+        Enemy->EnemyFSM->OnChangeMoveState();
     }
 }

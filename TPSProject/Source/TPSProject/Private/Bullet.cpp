@@ -50,6 +50,8 @@ void ABullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	FTimerHandle deathTimer;
+	GetWorld()->GetTimerManager().SetTimer(deathTimer, this, &ABullet::Die, 2.0f, false);
 }
 
 void ABullet::Die()

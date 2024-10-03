@@ -66,6 +66,8 @@ public:
 
 	// 피격 처리 함수
 	void OnDamage();
+	// 피격 애니메이션 전환 이벤트
+	void OnChangeMoveState();
 
 	// 적 체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)

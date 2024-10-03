@@ -46,6 +46,10 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	// 실행 창에 상태 메시지 출력
+	FString LogMsg = UEnum::GetValueAsString(eState);
+	GEngine->AddOnScreenDebugMessage(0, 1, FColor::Cyan, LogMsg);
+
 	// 생애 동안 상태를 갱신한다
 	switch (eState)
 	{
@@ -146,7 +150,7 @@ void UEnemyFSM::AttackState()
 	{
 		// 경과시간 초기화하고 공격 상태 변수 true
 		currentTime = 0;
-		Anim->bAttackPlay = true;
+		Anim-> bAttackPlay = true;
 	}
 
 	// 멀어지면 상태 전환
@@ -162,13 +166,14 @@ void UEnemyFSM::AttackState()
 
 void UEnemyFSM::DamageState()
 {
-	currentTime += GetWorld()->DeltaTimeSeconds;
+	// 몽타주로 처리
+	/*currentTime += GetWorld()->DeltaTimeSeconds;
 
 	if (currentTime > damageDelay)
 	{
 		eState = EEnemyState::Idle;
 		currentTime = 0;
-	}
+	}*/
 }
 
 void UEnemyFSM::DieState()
@@ -199,9 +204,16 @@ void UEnemyFSM::OnDamage()
 		me -> GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		// 죽음 애니메이션 재생
 		Anim->PlayDamageAnim(TEXT("Die"));
+
+		// me->Destroy();
 	}
 	// 애니메이션 상태 동기화
 	Anim->AnimState = eState;
+}
+
+void UEnemyFSM::OnChangeMoveState()
+{
+	eState = EEnemyState::Move;
 }
 
 bool UEnemyFSM::GetRandomPositionInNavMesh(FVector CenterLocation, float Radius, FVector& Dest)

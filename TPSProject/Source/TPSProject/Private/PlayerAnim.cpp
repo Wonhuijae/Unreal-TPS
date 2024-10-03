@@ -40,7 +40,6 @@ void UPlayerAnim::PlayAttackAnim()
 {
 	if (AttackAnimMontage)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("success"));
 		Montage_Play(AttackAnimMontage);
 	}
 }

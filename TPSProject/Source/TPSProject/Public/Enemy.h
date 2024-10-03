@@ -29,5 +29,5 @@ public:
 
 	// 적 AI 관리 컴포넌트 클래스
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
-	class UEnemyFSM* fsm;
+	class UEnemyFSM* EnemyFSM;
 };

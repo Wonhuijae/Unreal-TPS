@@ -87,4 +87,13 @@ public:
 	// 총알 발사 사운드
 	UPROPERTY(EditDefaultsOnly, Category = Sound)
 	class USoundBase* BulletSound;
+
+	// 중앙 십자선 UI
+	UPROPERTY(EditDefaultsOnly, Category = CrosshairUI)
+	TSubclassOf<class UUserWidget> CrosshairUIfactory;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UUserWidget* CrosshairUI;
+
+
 };
