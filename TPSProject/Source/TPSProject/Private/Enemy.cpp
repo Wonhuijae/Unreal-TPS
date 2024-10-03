@@ -30,6 +30,25 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// 생애 동안 상태를 갱신한다
+	switch (eState)
+	{
+		case EEnemyState::Idle:
+			IdleState();
+			break;
+		case EEnemyState::Move:
+			MoveState();
+			break;
+		case EEnemyState::Attack:
+			AttackState();
+			break;
+		case EEnemyState::Damage:
+			DamageState();
+			break;
+		case EEnemyState::Die:
+			DieState();
+			break;
+	}
 }
 
 // Called to bind functionality to input
@@ -37,5 +56,25 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AEnemy::IdleState()
+{
+}
+
+void AEnemy::MoveState()
+{
+}
+
+void AEnemy::AttackState()
+{
+}
+
+void AEnemy::DamageState()
+{
+}
+
+void AEnemy::DieState()
+{
 }
 
