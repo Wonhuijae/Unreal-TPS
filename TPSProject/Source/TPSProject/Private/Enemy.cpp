@@ -21,7 +21,7 @@ AEnemy::AEnemy()
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
 	}
 
-	EnemyFSM = CreateDefaultSubobject<UEnemyFSM>(TEXT("FSM"));
+	EnemyFSM = CreateDefaultSubobject<UEnemyFSM>(TEXT("EnemyFSM"));
 
 	// 애니메이션 블루프린트 할당하기
 	// 블루프린트 클래스는 반드시 _C를 붙여줌

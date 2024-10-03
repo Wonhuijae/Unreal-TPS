@@ -78,6 +78,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = FSM)
 	float damageDelay = 2.f;
 
+	// 사망 시 소멸 속도
+	UPROPERTY(EditAnywhere, Category = FSM)
+	float DieSpeed = 50.0f;
+
 	// 애니메이션 블루프린트 변수
 	UPROPERTY()
 	class UEnemyAnim* Anim;

@@ -95,5 +95,17 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UUserWidget* CrosshairUI;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Helth)
+	int32 hp;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Helth)
+	int32 maxHp = 10;
 
+	// 플레이어 피격
+	UFUNCTION(BlueprintCallable, Category = Health)
+	void OnHitEvent();
+
+	// 게임 오버
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Health)
+	void OnGameOver();
 };

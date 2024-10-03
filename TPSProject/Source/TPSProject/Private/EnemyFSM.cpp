@@ -178,6 +178,26 @@ void UEnemyFSM::DamageState()
 
 void UEnemyFSM::DieState()
 {
+	// 아직 죽음 애니메이션이 끝나지 않았다면
+	// 바닥으로 내려가지 않도록 처리
+	if (Anim->bDieDone == false)
+	{
+		return;
+	}
+
+	// 계속 아래로 내려간다
+	// 등속 운동 공식 P = P0 + VT
+	FVector P0 = me->GetActorLocation();
+	FVector VT = FVector::DownVector * DieSpeed * GetWorld()->DeltaTimeSeconds;
+	FVector P = P0 + VT;
+	me->SetActorLocation(P);
+
+	// 만약 2미터 이상 내려왔다면
+	if (P.Z < -200.0f)
+	{
+		// 제거시킨다.
+		me->Destroy();
+	}
 }
 
 void UEnemyFSM::OnDamage()

@@ -83,6 +83,9 @@ void ATPSPlayer::BeginPlay()
 	// UI 생성
 	CrosshairUI = CreateWidget(GetWorld(), CrosshairUIfactory);
 	CrosshairUI->AddToViewport();
+
+	// 체력 초기화
+	hp = maxHp;
 }
 
 // Called every frame
@@ -212,4 +215,19 @@ void ATPSPlayer::InputFire(const FInputActionValue& inputValue)
 		auto enemyFSM = Cast<UEnemyFSM>(enemy);
 		enemyFSM->OnDamage();
 	}
+}
+
+void ATPSPlayer::OnHitEvent()
+{
+	hp--;
+	if (hp <= 0)
+	{
+		OnGameOver();
+	}
+}
+
+// BlueprintNativeEvent로 선언된 함수는 _Implementation을 붙여 구현함
+void ATPSPlayer::OnGameOver_Implementation()
+{
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }
