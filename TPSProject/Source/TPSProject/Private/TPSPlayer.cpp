@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Bullet.h"
+#include "PlayerAnim.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -60,6 +61,9 @@ void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// 초기 속도는 걷기
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+
 	auto pc = Cast<APlayerController>(Controller);
 	if (pc)
 	{
@@ -95,7 +99,10 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		PlayerInput->BindAction(IA_LookUp, ETriggerEvent::Triggered, this, &ATPSPlayer::LookUp);
 		PlayerInput->BindAction(IA_PlayerMove, ETriggerEvent::Triggered, this, &ATPSPlayer::Move);
 		PlayerInput->BindAction(IA_InputJump, ETriggerEvent::Triggered, this, &ATPSPlayer::InputJump);
-		
+		// 뛰기 애니메이션
+		PlayerInput->BindAction(IA_Run, ETriggerEvent::Started, this, &ATPSPlayer::InputRun);
+		PlayerInput->BindAction(IA_Run, ETriggerEvent::Completed, this, &ATPSPlayer::InputRun);
+
 		// 발사
 		// Started: 누를 때 한 번만 처리되도록 함. 
 		PlayerInput->BindAction(IA_Fire, ETriggerEvent::Started, this, &ATPSPlayer::InputFire);
@@ -131,6 +138,21 @@ void ATPSPlayer::InputJump(const FInputActionValue& inputValue)
 	Jump();
 }
 
+void ATPSPlayer::InputRun()
+{
+	auto Movement = GetCharacterMovement();
+	// 만약, 현재 달리기 모드라면
+	if (Movement->MaxWalkSpeed > WalkSpeed)
+	{
+		// 걷기 속도로 전환
+		Movement->MaxWalkSpeed = WalkSpeed;
+	}
+	else
+	{
+		Movement->MaxWalkSpeed = RunSpeed;
+	}
+}
+
 void ATPSPlayer::PlayerMove()
 {
 	// 이동 처리를 위한 방향은 Tick에서 갱신해줘야 함
@@ -148,6 +170,13 @@ void ATPSPlayer::PlayerMove()
 
 void ATPSPlayer::InputFire(const FInputActionValue& inputValue)
 {
+	// 발사 애니메이션 재생
+	auto anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
+	anim->PlayAttackAnim();
+
+	// 총알 스폰
 	FTransform firePos = GetMesh()->GetSocketTransform(TEXT("Muzzle_01"));
 	GetWorld()->SpawnActor<ABullet>(BulletFactory, firePos);
+
+	 
 }

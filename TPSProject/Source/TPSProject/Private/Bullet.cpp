@@ -35,6 +35,7 @@ ABullet::ABullet()
 
 	MovementComp->bShouldBounce = true;
 	MovementComp->Bounciness = .3f;
+
 }
 
 // Called when the game starts or when spawned

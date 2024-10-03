@@ -43,6 +43,8 @@ public:
 	class UInputAction* IA_Turn;
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_InputJump;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Run;
 
 	// 좌우 회전
 	void Turn(const struct FInputActionValue& inputValue);
@@ -55,7 +57,9 @@ public:
 
 	// 속도
 	UPROPERTY(EditAnywhere, Category = "PlayerSetting")
-	float WalkSpeed = 600;
+	float WalkSpeed = 300;
+	UPROPERTY(EditAnywhere, Category = PlayerSetting)
+	float RunSpeed = 600;
 	// 방향
 	FVector Direction;
 	// 이동 처리 함수
@@ -63,6 +67,9 @@ public:
 
 	// 내장 Jump()함수와 구분하기 위해 다르게 써야 함
 	void InputJump(const struct FInputActionValue& inputValue);
+
+	// 달리기
+	void InputRun();
 
 	// move 관련 tick 함수 내 갱신 사항 정리 함수
 	void PlayerMove();
