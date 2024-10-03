@@ -6,6 +6,10 @@
 #include "Enemy.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
+#include "EnemyAnim.h"
+#include "AIController.h"
+#include "NavigationSystem.h"
+#include "Navigation/PathFollowingComponent.h"
 
 // Sets default values
 UEnemyFSM::UEnemyFSM()
@@ -18,6 +22,23 @@ UEnemyFSM::UEnemyFSM()
 void UEnemyFSM::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 월드에서 플레이어 타입의 타겟 찾기
+	auto Actor = UGameplayStatics::GetActorOfClass(GetWorld(), ATPSPlayer::StaticClass());
+	// ATPSPlayer 타입으로 캐스팅
+	target = Cast<ATPSPlayer>(Actor);
+	
+	// 자신을 소유한 객체 가져오기
+	me = Cast<AEnemy>(GetOwner());
+	// 사용 중인 UEnemyAnim 가져오기
+	Anim = Cast<UEnemyAnim>(me->GetMesh()->GetAnimInstance());
+
+	// AAIController 할당
+	AI = Cast<AAIController>(me->GetController());
+
+	// 체력 초기화
+	hp = 0;
+	UpdateHP(maxHp);
 }
 
 // Called every frame
@@ -55,24 +76,88 @@ void UEnemyFSM::IdleState()
 	{
 		eState = EEnemyState::Move;
 		currentTime = 0;
+		Anim->AnimState = eState;
+		
+		// 타겟이 없을 때는 랜덤한 위치로 이동함
+		GetRandomPositionInNavMesh(me->GetActorLocation(), 500, RandomPos);
 	}
-
-	// 타겟이 없을 때는 랜덤한 위치로 이동함
-	
 }
 
 void UEnemyFSM::MoveState()
 {
-	// 타겟이 있으면 그 방향으로 이동
+	// 타겟 방향 및 거리 구하기
 	FVector dest = target->GetActorLocation();
+	FVector dir = dest - me->GetActorLocation();
+
+	// 네비게이션
+	auto NS = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+	FPathFindingQuery query;
+	FAIMoveRequest req;
+
+	// 목적지 인식 범위
+	req.SetAcceptanceRadius(3);
+	req.SetGoalLocation(dest);
+
+	// 길찾기 쿼리 생성
+	AI->BuildPathfindingQuery(req, query);
+
+	// 쿼리 결과
+	FPathFindingResult R = NS->FindPathSync(query);
+
+	// 길찾기 성공
+	if (R.Result == ENavigationQueryResult::Success)
+	{
+		AI->MoveToLocation(dest);
+	}
+	// 실패
+	else
+	{
+		// 랜덤 이동
+		auto r = AI->MoveToLocation(RandomPos);
+		// 도착 시
+		if (r == EPathFollowingRequestResult::AlreadyAtGoal)
+		{
+			GetRandomPositionInNavMesh(me->GetActorLocation(), 500, RandomPos);
+		}
+	}
 
 	// 타겟과 거리가 가까우면 공격 상태로 전환
+	if (dir.Size() < attackRange)
+	{
+		eState = EEnemyState::Attack;
+		currentTime = 0;
+		AI->StopMovement();
+
+		Anim->AnimState = eState;
+		Anim->bAttackPlay = true;
+
+		// 대기 시간 종료
+		currentTime = attackDelay;
+	}
 	
 }
 
 void UEnemyFSM::AttackState()
 {
-	
+	// 일정 시간에 한 번씩 공격
+	currentTime += GetWorld()->DeltaTimeSeconds;
+
+	if (currentTime > attackDelay)
+	{
+		// 경과시간 초기화하고 공격 상태 변수 true
+		currentTime = 0;
+		Anim->bAttackPlay = true;
+	}
+
+	// 멀어지면 상태 전환
+	float Distance = FVector::Distance(target->GetActorLocation(), me->GetActorLocation());
+	if (Distance > attackRange)
+	{
+		eState = EEnemyState::Move;
+		Anim->AnimState = eState;
+
+		GetRandomPositionInNavMesh(me->GetActorLocation(), 500, RandomPos);
+	}
 }
 
 void UEnemyFSM::DamageState()
@@ -100,11 +185,9 @@ void UEnemyFSM::OnDamage()
 		eState = EEnemyState::Damage;
 
 		currentTime = 0;
-		//AI->StopMovement();
+		AI->StopMovement();
 		// 피격 애니메이션 재생
-		int32 index = FMath::RandRange(0, 1);
-		FString SectionName = FString::Printf(TEXT("Damage%d"), index);
-		//Anim->PlayDamageAnim(FName(*SectionName));
+		Anim->PlayDamageAnim(TEXT("Damage"));
 	}
 	// 그렇지 않다면
 	else
@@ -115,8 +198,22 @@ void UEnemyFSM::OnDamage()
 		// 캡슐 컴포넌트 충돌체 비활성화
 		me -> GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		// 죽음 애니메이션 재생
-		//Anim->PlayDamageAnim(TEXT("Die"));
+		Anim->PlayDamageAnim(TEXT("Die"));
 	}
 	// 애니메이션 상태 동기화
-	//Anim->AnimState = eState;
+	Anim->AnimState = eState;
+}
+
+bool UEnemyFSM::GetRandomPositionInNavMesh(FVector CenterLocation, float Radius, FVector& Dest)
+{
+	auto NS = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+	FNavLocation Loc;
+	bool Result = NS->GetRandomReachablePointInRadius(CenterLocation, Radius, Loc);
+	Dest = Loc.Location;
+	return Result;
+}
+
+void UEnemyFSM::UpdateHP(int32 NewHP)
+{
+	hp = FMath::Max(0, hp + NewHP);
 }

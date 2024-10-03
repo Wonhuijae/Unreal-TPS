@@ -57,15 +57,37 @@ public:
 	UPROPERTY()
 	class AEnemy* me;
 
+	// 공격 범위
+	UPROPERTY(EditAnywhere, Category = FSM)
+	float attackRange = 200.0f;
+	// 공격 대기 시간
+	UPROPERTY(EditAnywhere, Category = FSM)
+	float attackDelay = 2.5f;
+
 	// 피격 처리 함수
 	void OnDamage();
 
 	// 적 체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
-	int32 hp = 3;
+	int32 hp = 0;
+	int32 maxHp = 3;
 
 	// 피격 대기 시간
 	UPROPERTY(EditAnywhere, Category = FSM)
 	float damageDelay = 2.f;
 
+	// 애니메이션 블루프린트 변수
+	UPROPERTY()
+	class UEnemyAnim* Anim;
+
+	// Enemy를 소유하고 있는 AIController
+	UPROPERTY()
+	class AAIController* AI;
+
+	// 길을 찾을 경우 랜덤한 위치 변수
+	FVector RandomPos;
+	// 랜덤한 위치를 가져올 함수
+	bool GetRandomPositionInNavMesh(FVector CenterLocation, float Radius, FVector& Dest);
+
+	void UpdateHP(int32 NewHP);
 };

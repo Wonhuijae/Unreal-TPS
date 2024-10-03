@@ -18,6 +18,14 @@ AEnemy::AEnemy()
 	}
 
 	fsm = CreateDefaultSubobject<UEnemyFSM>(TEXT("FSM"));
+
+	// 애니메이션 블루프린트 할당하기
+	// 블루프린트 클래스는 반드시 _C를 붙여줌
+	ConstructorHelpers::FClassFinder<UAnimInstance> tempClass(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprint/ABP_Enemy.ABP_Enemy_C'"));
+	if (tempClass.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(tempClass.Class);
+	}
 }
 
 // Called when the game starts or when spawned
