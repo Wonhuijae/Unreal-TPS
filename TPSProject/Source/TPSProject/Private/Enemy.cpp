@@ -41,12 +41,31 @@ AEnemy::AEnemy()
 
 	EMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 	EMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	// 월드 배치 또는 스폰 시 자동으로 Possess
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	// 체력 UI
+	HPComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPComp"));
+	HPComp->SetupAttachment(RootComponent);
+	ConstructorHelpers::FClassFinder<UUserWidget> tempHP(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprint/WBP_EnemyHP.WBP_EnemyHP'"));
+	if (tempHP.Succeeded())
+	{
+		HPComp->SetWidgetClass(tempHP.Class);
+		// Draw Size = 150, 20
+		HPComp->SetDrawSize(FVector2D(150, 20));
+		// Location = 0, 0, 90
+		HPComp->SetRelativeLocation(FVector(0, 0, 90));
+		// 충돌체 설정
+		HPComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 
 // Called when the game starts or when spawned
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	
 }
 
@@ -55,6 +74,13 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// UKismetMathLibrary::FindLookAtRotation를 이용해서 HPComp를 카메라 쪽으로 회전
+	FVector Start = HPComp->K2_GetComponentLocation();
+	FVector Target = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->GetCameraLocation();
+
+	FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(Start, Target);
+
+	HPComp->SetWorldRotation(NewRotation);
 }
 
 // Called to bind functionality to input

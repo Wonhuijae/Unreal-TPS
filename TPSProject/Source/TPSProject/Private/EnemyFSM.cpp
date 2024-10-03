@@ -10,6 +10,9 @@
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Blueprint/UserWidget.h"
+#include "Components/ProgressBar.h"
 
 // Sets default values
 UEnemyFSM::UEnemyFSM()

@@ -96,4 +96,5 @@ public:
 	bool GetRandomPositionInNavMesh(FVector CenterLocation, float Radius, FVector& Dest);
 
 	void UpdateHP(int32 NewHP);
+
 };
