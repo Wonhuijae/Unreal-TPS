@@ -79,6 +79,10 @@ public:
 	// 템플릿에 등록된 클래스를 언리얼 에디터로부터 할당받음
 	TSubclassOf<class ABullet> BulletFactory;
 
+	// 카메라 셰이크 블루프린트 변수
+	UPROPERTY(EditDefaultsOnly, Category = CameraMotion)
+	TSubclassOf<class UCameraShakeBase> CameraShake;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Fire;
 	// 총알 발사 처리
@@ -87,6 +91,10 @@ public:
 	// 총알 발사 사운드
 	UPROPERTY(EditDefaultsOnly, Category = Sound)
 	class USoundBase* BulletSound;
+
+	// 총알 이펙트
+	UPROPERTY(EditAnywhere, Category = BulletEffect)
+	class UParticleSystem* BulletEffectFactory;
 
 	// 중앙 십자선 UI
 	UPROPERTY(EditDefaultsOnly, Category = CrosshairUI)

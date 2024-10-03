@@ -182,6 +182,13 @@ void ATPSPlayer::PlayerMove()
 
 void ATPSPlayer::InputFire(const FInputActionValue& inputValue)
 {
+	// 총알 발사 사운드 재생
+	UGameplayStatics::PlaySound2D(GetWorld(), BulletSound);
+
+	// 카메라 셰이크 재생
+	auto CameraManager = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
+	CameraManager->StartCameraShake(CameraShake);
+
 	// 발사 애니메이션 재생
 	auto anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
 	anim->PlayAttackAnim();
@@ -203,7 +210,7 @@ void ATPSPlayer::InputFire(const FInputActionValue& inputValue)
 	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, startPos, endPos, ECC_Visibility, Params);
 	if (bHit)
 	{
-		
+		// 충돌 위치에 효과 재생
 		FTransform effectPos;
 		effectPos.SetLocation(Hit.ImpactPoint);
 		// UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletEffectFactory, effectPos);
