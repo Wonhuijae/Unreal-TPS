@@ -95,6 +95,6 @@ public:
 	// 랜덤한 위치를 가져올 함수
 	bool GetRandomPositionInNavMesh(FVector CenterLocation, float Radius, FVector& Dest);
 
+	UFUNCTION(BlueprintCallable)
 	void UpdateHP(int32 NewHP);
-
 };

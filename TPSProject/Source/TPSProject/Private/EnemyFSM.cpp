@@ -42,6 +42,8 @@ void UEnemyFSM::BeginPlay()
 	// 체력 초기화
 	hp = 0;
 	UpdateHP(maxHp);
+
+	me->DamageUpdateHPUI(hp, maxHp);
 }
 
 // Called every frame
@@ -207,6 +209,7 @@ void UEnemyFSM::OnDamage()
 {
 	// 만약 체력이 남아있다면
 	hp--;
+	me->DamageUpdateHPUI(hp, maxHp);
 	if (hp > 0)
 	{
 		// 상태를 피격으로 전환
@@ -251,4 +254,5 @@ bool UEnemyFSM::GetRandomPositionInNavMesh(FVector CenterLocation, float Radius,
 void UEnemyFSM::UpdateHP(int32 NewHP)
 {
 	hp = FMath::Max(0, hp + NewHP);
+	me->DamageUpdateHPUI(hp, maxHp);
 }
