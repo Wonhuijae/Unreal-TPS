@@ -82,6 +82,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = FSM)
 	float DieSpeed = 50.0f;
 
+	// 사망 사운드
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	TArray<class USoundBase*> DeathSound;
+
+	// 피격 사운드
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	TArray<class USoundBase*> DamageSound;
+
 	// 애니메이션 블루프린트 변수
 	UPROPERTY()
 	class UEnemyAnim* Anim;
@@ -95,6 +103,8 @@ public:
 	// 랜덤한 위치를 가져올 함수
 	bool GetRandomPositionInNavMesh(FVector CenterLocation, float Radius, FVector& Dest);
 
-	UFUNCTION(BlueprintCallable)
 	void UpdateHP(int32 NewHP);
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	class USoundBase* AttackSound;
 };
