@@ -213,7 +213,7 @@ void ATPSPlayer::InputFire(const FInputActionValue& inputValue)
 		// 충돌 위치에 효과 재생
 		FTransform effectPos;
 		effectPos.SetLocation(Hit.ImpactPoint);
-		// UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletEffectFactory, effectPos);
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletEffectFactory, effectPos);
 	}
 	
 	auto enemy = Hit.GetActor()->GetDefaultSubobjectByName(TEXT("EnemyFSM"));

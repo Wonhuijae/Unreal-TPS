@@ -150,6 +150,7 @@ void UEnemyFSM::AttackState()
 {
 	// 일정 시간에 한 번씩 공격
 	currentTime += GetWorld()->DeltaTimeSeconds;
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), AttackSound, me->GetActorLocation());
 
 	if (currentTime > attackDelay)
 	{
@@ -212,6 +213,11 @@ void UEnemyFSM::OnDamage()
 	me->DamageUpdateHPUI(hp, maxHp);
 	if (hp > 0)
 	{
+		int32 idx = FMath::RandRange(0, DamageSound.Num() - 1);
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), DamageSound[idx], me->GetActorLocation());
+
+
+
 		// 상태를 피격으로 전환
 		eState = EEnemyState::Damage;
 
@@ -225,6 +231,9 @@ void UEnemyFSM::OnDamage()
 	{
 		// 상태를 죽음으로 전환
 		eState = EEnemyState::Die;
+
+		int32 idx = FMath::RandRange(0, DeathSound.Num() - 1);
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSound[idx], me->GetActorLocation());
 
 		// 캡슐 컴포넌트 충돌체 비활성화
 		me -> GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
